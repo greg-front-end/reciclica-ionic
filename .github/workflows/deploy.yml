@@ -1,5 +1,6 @@
 name: Deploy app
 on: 
+  push:
   workflow_dispatch:
   pull_request:
     types: [opened]
@@ -8,16 +9,31 @@ on:
     paths-ignore:
       - '.github/workflows/*'
 jobs: 
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Get repo code
+      - name: Checkout
         uses: actions/checkout@v3
+
       - name: Install dependecies
         run: npm ci
+
+      - name: Caching
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node-modules-{{ hashFiles('**/package-lock.json') }}
+
+
       - name: Lint app
         run: npm run lint
+
       - name: Build app
         run: npm run build
+
       - name: Deploy
-        run: echo deploying...
+        uses: JamesIves/github-pages-deploy-action@v4
+        with: 
+          branch: gh-pages
+          folder: dist
