@@ -1,0 +1,24 @@
+name: Lint app
+on: workflow_dispatch
+jobs: 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get repo code
+        uses: actions/checkout@v3
+      - name: Install dependecies
+        run: npm ci
+      - name: Lint app
+        run: npm run lint
+  build:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get repo code
+        uses: actions/checkout@v3
+      - name: Install dependecies
+        run: npm ci
+      - name: Build app
+        run: npm run build
+      - name: Deploy
+        run: echo deploying...
