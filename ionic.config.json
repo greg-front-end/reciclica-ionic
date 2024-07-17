@@ -3,5 +3,6 @@
   "integrations": {
     "capacitor": {}
   },
+  "base_href": "./",
   "type": "angular-standalone"
 }
