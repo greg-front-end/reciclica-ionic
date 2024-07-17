@@ -13,15 +13,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: All things angular
-        uses: AhsanAyaz/angular-deploy-gh-pages-actions@v1.4.0 ## replace by latest version without it you will see Expected format {org}/{repo}[/path]@ref. Actual 'AhsanAyaz/angular-deploy-gh-pages-actions',Input string was not in a correct format.
-        with:
-          github_access_token: ${{ secrets.IONIC_DEPLOY }} # see the Configuration section for how you can create secrets
-          build_configuration: npx ng build # The build environment for the app. please look configurations in your angular.json
-          base_href: ''   # make sure this corresponds to https://<your_username>.github.io/<base_href>/
-          deploy_branch: gh-pages # The branch the action should deploy to.
-          angular_dist_build_folder: dist # The folder where your project is supposed to be after running ng build by the action.
+      - name: Checkout
+        uses: actions/checkout@v3
 
-permissions:
-  contents: write # Allow write permission to GITHUB_TOKEN to commit to deploy branch.
+      - name: Install dependecies
+        run: npm ci
+
+      - name: Caching
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node-modules-{{ hashFiles('**/package-lock.json') }}
+
+
+      - name: Lint app
+        run: npm run lint
+
+      - name: Build app
+        run: npm run build
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with: 
+          branch: gh-pages
+          folder: dist
